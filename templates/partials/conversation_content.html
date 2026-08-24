@@ -1,0 +1,85 @@
+{% if messages %}
+  {% for message in messages %}
+    <article class="message-row {{ message.role }}">
+      <div class="message-meta">{% if message.role == 'user' %}You{% else %}Sales Assistant{% endif %}</div>
+      <div class="message-card">
+        <div class="message-content">
+
+          {% if message.role == "user" and message.attachment_name %}
+
+            <div class="conversation-file-chip">
+
+              <span class="file-type">
+                TXT
+              </span>
+
+              <span class="file-name">
+                {{ message.attachment_name }}
+              </span>
+
+            </div>
+
+            {% if message.visible_text %}
+
+              <div class="message-note">
+                {{ message.visible_text }}
+              </div>
+
+            {% endif %}
+
+          {% else %}
+
+            {{ message.content }}
+
+          {% endif %}
+
+        </div>
+        {% if message.role == 'assistant' %}
+          <div class="message-actions">
+            <button
+              type="button"
+              class="copy-btn"
+              hx-on:click="navigator.clipboard.writeText(this.closest('.message-card').querySelector('.message-content').innerText); this.textContent='Copied'; setTimeout(() => this.textContent='Copy', 1100)"
+            >Copy</button>
+          </div>
+        {% endif %}
+      </div>
+    </article>
+  {% endfor %}
+{% else %}
+  <div class="empty-state">
+    <div class="spark">✦</div>
+    <h2>What should you send next?</h2>
+    <p>{{ cfg.empty }}</p>
+
+    <div class="starter-grid">
+      <button
+        class="starter"
+        hx-get="/ui/starter?mode={{ mode }}&text={{ 'The client said: “It’s too expensive.” What should I reply?'|urlencode }}"
+        hx-target="#messageInput"
+        hx-swap="outerHTML"
+      >“It’s too expensive”</button>
+
+      <button
+        class="starter"
+        hx-get="/ui/starter?mode={{ mode }}&text={{ 'The client said: “I need to think about it.” Give me the best next reply.'|urlencode }}"
+        hx-target="#messageInput"
+        hx-swap="outerHTML"
+      >“I need to think”</button>
+
+      <button
+        class="starter"
+        hx-get="/ui/starter?mode={{ mode }}&text={{ 'The client watched the demo and asked how much it costs. What should I say?'|urlencode }}"
+        hx-target="#messageInput"
+        hx-swap="outerHTML"
+      >Asked for price</button>
+
+      <button
+        class="starter"
+        hx-get="/ui/starter?mode={{ mode }}&text={{ 'The client has stopped replying. Tell me whether I should follow up and what to send.'|urlencode }}"
+        hx-target="#messageInput"
+        hx-swap="outerHTML"
+      >Lead went quiet</button>
+    </div>
+  </div>
+{% endif %}

@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en" data-theme="{{ theme }}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="{% if theme == 'dark' %}#232323{% else %}#f4f6f7{% endif %}" />
+  <title>Mount Olympus AI</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script src="https://unpkg.com/htmx.org@2.0.8" defer></script>
+</head>
+<body>
+  {% include "partials/app_shell.html" %}
+</body>
+</html>

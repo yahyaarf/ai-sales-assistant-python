@@ -1,0 +1,58 @@
+
+{% include "partials/conversation_content.html" %}
+
+
+<article
+  class="message-row assistant pending-reply"
+  id="pendingReply-{{ current_message_id }}"
+
+  hx-post="/assist/generate"
+  hx-trigger="load"
+  hx-target="this"
+  hx-swap="outerHTML"
+
+  hx-vals='{
+    "message_id":"{{ current_message_id }}",
+    "mode":"{{ mode }}",
+    "channel":"{{ channel }}"
+  }'
+>
+
+  <div class="message-meta">
+    Sales Assistant
+  </div>
+
+  <div class="message-card thinking-card">
+
+    <div class="message-content thinking-message">
+
+      <span class="thinking-dot"></span>
+
+      <span>
+        Thinking
+      </span>
+
+      <span class="typing"></span>
+
+    </div>
+
+  </div>
+
+</article>
+
+
+<textarea
+  id="messageInput"
+  name="message"
+  rows="4"
+  placeholder="{{ textarea_placeholder }}"
+  maxlength="120000"
+  hx-swap-oob="outerHTML"
+></textarea>
+
+
+<div
+  id="attachmentArea"
+  class="attachment-area"
+  hx-swap-oob="outerHTML"
+></div>

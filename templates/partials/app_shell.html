@@ -1,0 +1,144 @@
+<div class="app-shell" id="appShell">
+  <aside class="sidebar">
+    <div class="brand">
+      {% if logo_exists %}
+        <img class="brand-logo" src="/static/assets/new.png" alt="Mount Olympus AI logo" />
+      {% else %}
+        <div class="brand-mark">MO</div>
+      {% endif %}
+      <div>
+        <strong>Mount Olympus AI</strong>
+      </div>
+    </div>
+
+    <button
+      class="new-chat"
+      hx-post="/ui/new-chat?mode={{ mode }}&channel={{ channel }}"
+      hx-target="#appShell"
+      hx-swap="outerHTML"
+    >+ New conversation</button>
+
+    <nav class="mode-list" aria-label="Assistant mode">
+      <button
+        class="mode {% if mode == 'copilot' %}active{% endif %}"
+        hx-get="/ui?mode=copilot&channel={{ channel }}"
+        hx-target="#appShell"
+        hx-swap="outerHTML"
+        hx-push-url="/?mode=copilot&channel={{ channel }}"
+      >
+        <span class="mode-icon">✦</span>
+        <span><strong>Sales Copilot</strong><small>Reply + tactical guidance</small></span>
+      </button>
+
+      <button
+        class="mode {% if mode == 'full_chat' %}active{% endif %}"
+        hx-get="/ui?mode=full_chat&channel={{ channel }}"
+        hx-target="#appShell"
+        hx-swap="outerHTML"
+        hx-push-url="/?mode=full_chat&channel={{ channel }}"
+      >
+        <span class="mode-icon">▤</span>
+        <span><strong>Paste Full Chat</strong><small>Only the next message</small></span>
+      </button>
+
+      <button
+        class="mode {% if mode == 'objection' %}active{% endif %}"
+        hx-get="/ui?mode=objection&channel={{ channel }}"
+        hx-target="#appShell"
+        hx-swap="outerHTML"
+        hx-push-url="/?mode=objection&channel={{ channel }}"
+      >
+        <span class="mode-icon">↗</span>
+        <span><strong>Objection Help</strong><small>Handle one situation fast</small></span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="status-dot"></div>
+      <span>Sales rules loaded</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1>{{ cfg.title }}</h1>
+        <p>{{ cfg.subtitle }}</p>
+      </div>
+
+      <div class="topbar-actions">
+        <a
+          class="theme-toggle"
+          href="/theme/{{ next_theme }}?mode={{ mode }}&channel={{ channel }}"
+        >{{ next_theme|capitalize }} mode</a>
+
+        <label class="channel-select">
+          <span>Channel</span>
+          <select name="channel" form="composerForm">
+            {% for item in ["WhatsApp", "SMS", "Email", "Call"] %}
+              <option value="{{ item }}" {% if item == channel %}selected{% endif %}>{{ item }}</option>
+            {% endfor %}
+          </select>
+        </label>
+      </div>
+    </header>
+
+    <section class="conversation" id="conversation" aria-live="polite">
+      {% include "partials/conversation_content.html" %}
+    </section>
+
+    <section class="composer-wrap">
+      <div class="mode-banner">
+        <span>✦</span>
+        <div>
+          <strong>{{ cfg.banner_title }}</strong>
+          <small>{{ cfg.banner_text }}</small>
+        </div>
+      </div>
+
+      <form
+        class="composer"
+        id="composerForm"
+        hx-post="/assist/start"
+        hx-target="#conversation"
+        hx-swap="innerHTML"
+      >
+        <input type="hidden" name="mode" value="{{ mode }}" />
+
+        <div
+          id="attachmentArea"
+          class="attachment-area"
+        ></div>
+
+        {% include "partials/textarea.html" with context %}
+
+        <div class="composer-bottom">
+          <div class="composer-tools">
+            <label class="upload-btn" for="chatFileInput">Import .txt</label>
+            <input
+              id="chatFileInput"
+              name="chat_file"
+              type="file"
+              accept=".txt,text/plain"
+              hidden
+              hx-post="/import-chat"
+              hx-encoding="multipart/form-data"
+              hx-target="#attachmentArea"
+              hx-swap="outerHTML"
+              hx-trigger="change"
+              hx-on::after-request="this.value=''"
+            />
+
+            <span class="hint">HTMX + FastAPI</span>
+          </div>
+
+          <button type="submit" class="send-btn">
+            Generate reply <span>↑</span>
+          </button>
+        </div>
+      </form>
+
+      <p class="disclaimer">Internal sales tool. Review sensitive pricing or commitments before sending.</p>
+    </section>
+  </main>
+</div>
